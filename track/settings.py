@@ -50,8 +50,6 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
 
 ]
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # new
-SITE_ID = 1  # new
 
 # config/settings.py
 REST_FRAMEWORK = {
@@ -59,10 +57,39 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',  # new
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',  # new
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ],
 }
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
+
+}
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
+
+    'LOGIN_SERIALIZER': 'users.serializers.CustomLoginSerializer',
+
+
+}
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'app-auth'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # new
+SITE_ID = 1  # new
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+LOGIN_URL = 'http://localhost:8000/api/users/login'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'danieladebowale192@gmail.com'
+EMAIL_HOST_PASSWORD = 'dlion5ive'
+EMAIL_PORT = 587
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
