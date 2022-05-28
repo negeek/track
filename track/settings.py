@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-cg1+a_)1$+x4$82mmeeg!fn_^mqu^l=8ca-v9cis3nz6x-2nv+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['trackfi.herokuapp.com', '127.0.0.1']
 
 
 # Application definition
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'dj_rest_auth.registration',
 
 ]

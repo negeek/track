@@ -1,7 +1,7 @@
 from django.urls import path, re_path
 from dj_rest_auth.registration.views import VerifyEmailView, ConfirmEmailView, RegisterView
 from dj_rest_auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
-
+from .views import GoogleLogin
 
 urlpatterns = [
     path('account-confirm-email/<str:key>/', ConfirmEmailView.as_view()),
@@ -18,4 +18,5 @@ urlpatterns = [
     path('password-reset/', PasswordResetView.as_view()),
     path('password-reset-confirm/<uidb64>/<token>/',
          PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('google/', GoogleLogin.as_view(), name='google_login')
 ]
