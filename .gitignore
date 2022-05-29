@@ -1,4 +1,4 @@
-
+.env
 # Django #
 *.log
 *.pot

@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
-
+import environ
+# Initialise environment variables
+env = environ.Env()
+environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-cg1+a_)1$+x4$82mmeeg!fn_^mqu^l=8ca-v9cis3nz6x-2nv+'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 #ALLOWED_HOSTS = ['trackfi.herokuapp.com', '127.0.0.1']
 ALLOWED_HOSTS = ['*']
@@ -91,13 +94,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 #LOGOUT_REDIRECT_URL = 'http://localhost:8000/api/users/login'
 #ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 #LOGIN_URL = 'http://localhost:8000/api/users/login'
-'''
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'danieladebowale192@gmail.com'
-EMAIL_HOST_PASSWORD = 'dlion5ive'
-EMAIL_PORT = 587'''
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -142,7 +139,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'trackDb',
         'USER': 'postgres',
-        'PASSWORD': 'dlion5ive',
+        'PASSWORD': env('DB_PASSWORD'),
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
