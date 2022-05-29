@@ -36,6 +36,7 @@ oscrypto==1.3.0
 packaging==21.3
 pandas==1.3.5
 Pillow==9.1.0
+psycopg2-binary==2.9.3
 pycodestyle==2.8.0
 pycparser==2.21
 pyHanko==0.12.1
