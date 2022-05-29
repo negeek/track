@@ -82,15 +82,18 @@ JWT_AUTH_COOKIE = 'app-auth'
 SITE_ID = 1  # new
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+SIGNUP_REDIRECT_URL = 'http://localhost:8000/api/users/login'
+LOGOUT_REDIRECT_URL = 'http://localhost:8000/api/users/login'
+#ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 LOGIN_URL = 'http://localhost:8000/api/users/login'
+'''
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'danieladebowale192@gmail.com'
 EMAIL_HOST_PASSWORD = 'dlion5ive'
-EMAIL_PORT = 587
+EMAIL_PORT = 587'''
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
