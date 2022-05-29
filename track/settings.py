@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-cg1+a_)1$+x4$82mmeeg!fn_^mqu^l=8ca-v9cis3nz6x-2nv+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 #ALLOWED_HOSTS = ['trackfi.herokuapp.com', '127.0.0.1']
 ALLOWED_HOSTS = ['*']
