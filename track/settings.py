@@ -83,10 +83,10 @@ SITE_ID = 1  # new
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-SIGNUP_REDIRECT_URL = 'http://localhost:8000/api/users/login'
-LOGOUT_REDIRECT_URL = 'http://localhost:8000/api/users/login'
+#SIGNUP_REDIRECT_URL = 'http://localhost:8000/api/users/login'
+#LOGOUT_REDIRECT_URL = 'http://localhost:8000/api/users/login'
 #ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-LOGIN_URL = 'http://localhost:8000/api/users/login'
+#LOGIN_URL = 'http://localhost:8000/api/users/login'
 '''
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
