@@ -137,7 +137,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'trackDb',
         'USER': 'postgres',
-        'PASSWORD': config("DB_PASSWORD"),
+        'PASSWORD': config("DB_PASSWORD", default=''),
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
