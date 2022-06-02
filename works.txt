@@ -1,0 +1,21 @@
+USER AUTHENTICATION 
+
+WORK DONE
+*register endpoint
+*login endpoint
+*logout endpoint
+
+PENDING WORK
+*email verification on registration
+*forgot password with email support
+*password reset
+*signin with google
+
+
+USER PROFILE
+*user image
+*full name
+*username
+*email
+*phone number
+

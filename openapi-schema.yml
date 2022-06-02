@@ -1,0 +1,178 @@
+openapi: 3.0.2
+info:
+  title: ''
+  version: ''
+paths:
+  /api/transactions/:
+    get:
+      operationId: listTransactionDetails
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+          description: ''
+      tags:
+      - api
+  /api/users/logout/:
+    get:
+      operationId: listLogouts
+      description: 'Calls Django logout method and delete the Token object
+
+        assigned to the current User object.
+
+
+        Accepts/Returns nothing.'
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+          description: ''
+      tags:
+      - api
+    post:
+      operationId: createLogout
+      description: 'Calls Django logout method and delete the Token object
+
+        assigned to the current User object.
+
+
+        Accepts/Returns nothing.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+          application/x-www-form-urlencoded:
+            schema: {}
+          multipart/form-data:
+            schema: {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+      tags:
+      - api
+  /api/users/register/:
+    post:
+      operationId: createCustomRegister
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomRegister'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomRegister'
+          description: ''
+      tags:
+      - api
+  /api/users/login/:
+    post:
+      operationId: createCustomLogin
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomLogin'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomLogin'
+          description: ''
+      tags:
+      - api
+  /api/users/google/:
+    post:
+      operationId: createSocialLogin
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SocialLogin'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialLogin'
+          description: ''
+      tags:
+      - api
+components:
+  schemas:
+    CustomRegister:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 150
+          minLength: 1
+        email:
+          type: string
+          format: email
+        password1:
+          type: string
+          writeOnly: true
+      required:
+      - username
+      - email
+      - password1
+    CustomLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - password
+    SocialLogin:
+      type: object
+      properties:
+        access_token:
+          type: string
+        code:
+          type: string
+        id_token:
+          type: string
