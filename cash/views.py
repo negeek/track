@@ -7,11 +7,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # Create your views here.
 
-'''
+
 class TransactionList(generics.ListCreateAPIView):
     queryset = Transaction.objects.all()
-    serializer_class = TransactionSerializer
-    
+    serializer_class = TransactionDetailSerializer
+
+
+'''    
     class TransactionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer

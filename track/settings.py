@@ -32,6 +32,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 #ALLOWED_HOSTS = ['trackfi.herokuapp.com', '127.0.0.1']
 ALLOWED_HOSTS = ['*']
+# 'trackfi.herokuapp.com'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -195,3 +196,20 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'offline',
+        }
+    }
+}
+# id="389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com"
+# secret="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"
+LOGIN_REDIRECT_URL = 'https://trackfi.herokuapp.com/api/all-transactions'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'https://trackfi.herokuapp.com/api/users/register'
+
+'''https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http://127.0.0.1:8000/accounts/google/login/callback/&prompt=consent&response_type=code&client_id=389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline'''

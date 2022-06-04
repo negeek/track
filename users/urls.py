@@ -18,5 +18,5 @@ urlpatterns = [
     #path('password-reset/', PasswordResetView.as_view()),
     # path('password-reset-confirm/<uidb64>/<token>/',
     # PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    path('google/', GoogleLogin.as_view(), name='google_login')
+    path('social/google/', GoogleLogin.as_view(), name='google_login')
 ]

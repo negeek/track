@@ -16,7 +16,7 @@ from django.utils import timezone
 class GoogleLogin(SocialLoginView):  # if you want to use Implicit Grant, use this
     adapter_class = GoogleOAuth2Adapter
     client_class = OAuth2Client
-    callback_url = "http://127.0.0.1:8000/api/users/google/login/callback/"
+    callback_url = "https://trackfi.herokuapp.com/accounts/google/login/callback/"
 
 
 class CustomRegisterView(RegisterView):

@@ -17,3 +17,6 @@ class TransactionDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'owner', 'name', 'amount',
                   'description', 'date_added', 'category_name')
         model = Transaction
+
+
+
