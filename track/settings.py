@@ -213,3 +213,6 @@ LOGIN_REDIRECT_URL = 'https://trackfi.herokuapp.com/api/all-transactions'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'https://trackfi.herokuapp.com/api/users/register'
 
 '''https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http://127.0.0.1:8000/accounts/google/login/callback/&prompt=consent&response_type=code&client_id=389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline'''
+
+
+'''https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=https://trackfi.herokuapp.com/api/users/social/google/&prompt=consent&response_type=code&client_id=389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline'''
