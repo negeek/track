@@ -36,7 +36,7 @@ ALLOWED_HOSTS = ['*']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-
+AUTH_USER_MODEL = 'users.CustomUser'
 # Application definition
 
 INSTALLED_APPS = [
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
 
     'cash.apps.CashConfig',
+    'users.apps.UsersConfig',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -59,14 +60,15 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'dj_rest_auth.registration',
     'corsheaders',
-    'drf_yasg'
+    'drf_yasg',
+    'url64'
 
 ]
 
 # config/settings.py
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # new
+        'rest_framework.permissions.AllowAny',  # new
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
@@ -209,10 +211,15 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 # id="389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com"
 # secret="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"
-LOGIN_REDIRECT_URL = 'https://trackfi.herokuapp.com/api/all-transactions'
-ACCOUNT_LOGOUT_REDIRECT_URL = 'https://trackfi.herokuapp.com/api/users/register'
+#LOGIN_REDIRECT_URL = 'https://trackfi.herokuapp.com/api/all-transactions'
+#ACCOUNT_LOGOUT_REDIRECT_URL = 'https://trackfi.herokuapp.com/api/users/register'
 
-'''https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http://127.0.0.1:8000/accounts/google/login/callback/&prompt=consent&response_type=code&client_id=389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline'''
+LOGIN_REDIRECT_URL = 'http://127.0.0.1:8000/api/all-transactions'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'http://127.0.0.1:8000/api/users/register'
+
+'''https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http://127.0.0.1:8000/api/users/social/google/&prompt=consent&response_type=code&client_id=389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline'''
 
 
 '''https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=https://trackfi.herokuapp.com/api/users/social/google/&prompt=consent&response_type=code&client_id=389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline'''
+
+'''https://apitest.acme.com/oauth/authorize?response_type=code&client_id=389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j&redirect_uri=http://127.0.0.1:8000/api/users/social/google/'''

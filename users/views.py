@@ -1,3 +1,5 @@
+from typing import Tuple
+from rest_framework.decorators import api_view
 from calendar import c
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
@@ -8,15 +10,128 @@ from dj_rest_auth.views import LoginView, LogoutView, PasswordResetView, Passwor
 from rest_framework.response import Response
 
 from rest_framework import status
-
 from django.conf import settings
 from django.utils import timezone
+import base64
+from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.hashers import make_password
+from rest_framework.utils import json
+from rest_framework.views import APIView
+from rest_framework.response import Response
+import requests
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import User
+
+from django.core.exceptions import ValidationError
+from rest_framework import exceptions, serializers
 
 
-class GoogleLogin(SocialLoginView):  # if you want to use Implicit Grant, use this
+def payload(id_token):
+    count = 0
+    indexes = []
+    for i in range(len(id_token)):
+        if id_token[i] == '.':
+            indexes.append(i)
+            count += 1
+        if count >= 2:
+            break
+    return indexes
+
+
+def google_get_access_token(*, code: str, redirect_uri: str) -> str:
+    # Reference: https://developers.google.com/identity/protocols/oauth2/web-server#obtainingaccesstokens
+    data = {
+        'code': code,
+        'client_id': '389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com',
+        'client_secret': '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',
+        'redirect_uri': redirect_uri,
+        'grant_type': 'authorization_code',
+
+    }
+
+    response = requests.post('https://oauth2.googleapis.com/token', data=data)
+
+    if not response.ok:
+        raise ValidationError('Failed to obtain access token from Google.')
+
+    details = response.json()
+
+    return details
+
+
+def user_create(email, username, password=None):
+    extra_fields = {
+        'is_staff': False,
+        'is_superuser': False,
+    }
+
+    user = User(email=email, username=username)
+
+    if password:
+        user.set_password(password)
+    else:
+        user.set_unusable_password()
+
+    user.full_clean()
+    user.save()
+
+    return user
+
+
+def user_get_or_create(email, username):
+    user = User.objects.filter(email=email).first()
+
+    if user:
+        return user
+
+    return user_create(email=email, username=username)
+
+
+@api_view(['GET', 'POST'])
+def GoogleLoginApi(request):
+
+    code = request.GET['code']
+
+    redirect_uri = 'http://127.0.0.1:8000/api/users/social/google/'
+
+    tokens = google_get_access_token(
+        code=code, redirect_uri=redirect_uri)
+
+    access_token, refresh_token = tokens['access_token'], tokens['refresh_token']
+    id_token = tokens['id_token']
+    payloadIdx = payload(id_token)
+    payloadStr = id_token[payloadIdx[0]+1:payloadIdx[1]]
+    print(payloadStr)
+
+    user_info = base64.urlsafe_b64decode(payloadStr + '===')
+    user_info = json.loads(user_info.decode("utf-8"))
+    # return Response(user_info)
+
+    profile_data = {
+        'email': user_info['email'],
+        'username': user_info['given_name']
+    }
+
+    # We use get-or-create logic here for the sake of the example.
+    # We don't have a sign-up flow.
+    user = user_get_or_create(profile_data['email'], profile_data['username'])
+    if user:
+        success = True
+    else:
+        success = False
+
+    response = {}
+    response['user'] = profile_data
+    response['success'] = success
+    response['access_token'] = access_token
+    response['refresh_token'] = refresh_token
+    return Response(response)
+
+
+class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
+    callback_url = "http://127.0.0.1:8000/api/users/social/google/"
     client_class = OAuth2Client
-    callback_url = "https://trackfi.herokuapp.com/api/users/social/google/"
 
 
 class CustomRegisterView(RegisterView):
