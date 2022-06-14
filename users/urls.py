@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 from dj_rest_auth.registration.views import VerifyEmailView, ConfirmEmailView, RegisterView
-from dj_rest_auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
+from dj_rest_auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView, PasswordChangeView
 from .views import GoogleLogin, CustomLoginView, CustomRegisterView, GoogleLoginApi
 
 urlpatterns = [
@@ -8,6 +8,7 @@ urlpatterns = [
     path('register/', CustomRegisterView.as_view()),
     path('login/', CustomLoginView.as_view()),
     path('logout/', LogoutView.as_view()),
+    path('password-change/', PasswordChangeView.as_view()),
 
     # path('verify-email/',
     # VerifyEmailView.as_view(), name='rest_verify_email'),

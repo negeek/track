@@ -7,10 +7,11 @@ from rest_framework import serializers
 from rest_framework import exceptions, serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
-from dj_rest_auth.serializers import LoginSerializer
+from dj_rest_auth.serializers import LoginSerializer, PasswordChangeSerializer
 from rest_framework.response import Response
 from track import settings
 from django.urls import exceptions as url_exceptions
+from .forms import CustomSetPasswordForm
 
 
 class CustomRegisterSerializer(RegisterSerializer):
@@ -41,3 +42,11 @@ class CustomLoginSerializer(LoginSerializer):
 
     def _validate_username(self, username, password):
         pass
+
+
+class CustomPasswordChange(PasswordChangeSerializer):
+    set_password_form_class = CustomSetPasswordForm
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        del self.fields['new_password2']
