@@ -44,7 +44,7 @@ class CustomLoginSerializer(LoginSerializer):
         pass
 
 
-class CustomPasswordChange(PasswordChangeSerializer):
+class CustomPasswordChangeSerializer(PasswordChangeSerializer):
     set_password_form_class = CustomSetPasswordForm
 
     def __init__(self, *args, **kwargs):

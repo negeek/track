@@ -1,3 +1,4 @@
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from typing import Tuple
 from rest_framework.decorators import api_view
 from calendar import c
@@ -6,7 +7,7 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
 from dj_rest_auth.registration.views import VerifyEmailView, ConfirmEmailView, RegisterView
 
-from dj_rest_auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
+from dj_rest_auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView, PasswordChangeView
 from rest_framework.response import Response
 
 from rest_framework import status
@@ -24,6 +25,7 @@ from django.contrib.auth.models import User
 
 from django.core.exceptions import ValidationError
 from rest_framework import exceptions, serializers
+from .serializers import CustomPasswordChangeSerializer
 
 
 def payload(id_token):
@@ -222,3 +224,19 @@ class CustomLoginView(LoginView):
         response = Response(data, status=status.HTTP_200_OK)
 
         return response
+
+
+class CustomPasswordChangeView(PasswordChangeView):
+    """
+    Calls Django Auth SetPasswordForm save method.
+    Accepts the following POST parameters: new_password1, new_password2
+    Returns the success/fail message.
+    """
+    serializer_class = CustomPasswordChangeSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'message': 'New password has been saved.',
+                         'success': True})

@@ -67,12 +67,15 @@ INSTALLED_APPS = [
 # config/settings.py
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # new
+        # 'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',  # new
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
 }
+
 AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -88,6 +91,7 @@ REST_AUTH_SERIALIZERS = {
 
 
 }
+OLD_PASSWORD_FIELD_ENABLED = True
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'app-auth'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # new
