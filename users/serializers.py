@@ -1,6 +1,7 @@
 
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext_lazy as _
+from allauth.account.adapter import get_adapter
 
 from rest_framework import serializers
 
@@ -12,6 +13,8 @@ from rest_framework.response import Response
 from track import settings
 from django.urls import exceptions as url_exceptions
 from .forms import CustomSetPasswordForm
+from allauth.account import app_settings as allauth_settings
+from allauth.utils import email_address_exists, get_username_max_length
 
 
 class CustomRegisterSerializer(RegisterSerializer):
@@ -22,8 +25,18 @@ class CustomRegisterSerializer(RegisterSerializer):
 
     def validate(self, data):
         if data['password1'] == ' ':
-            raise serializers.ValidationError(_("input password!."))
+            msg = {'error': {'message': 'input password!.'}}
+            raise serializers.ValidationError(msg)
         return data
+
+    def validate_email(self, email):
+        email = get_adapter().clean_email(email)
+        if allauth_settings.UNIQUE_EMAIL:
+            if email and email_address_exists(email):
+                msg = {
+                    'error': {'message': 'A user is already registered with this e-mail address.'}}
+                raise serializers.ValidationError(msg)
+        return email
 
     def save(self, request):
         user = super().save(request)
@@ -35,6 +48,8 @@ class CustomRegisterSerializer(RegisterSerializer):
 
 
 class CustomLoginSerializer(LoginSerializer):
+    password = serializers.CharField(required=False, allow_blank=True, style={
+                                     'input_type': 'password'})
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,6 +57,71 @@ class CustomLoginSerializer(LoginSerializer):
 
     def _validate_username(self, username, password):
         pass
+
+    def _validate_email(self, email, password):
+        if email and password:
+            user = self.authenticate(email=email, password=password)
+        else:
+            msg = {'error': {'message': 'must include email and password'}}
+            raise exceptions.ValidationError(msg)
+            # return response
+
+        return user
+
+    def get_auth_user(self, username, email, password):
+        """
+        Retrieve the auth user from given POST payload by using
+        either `allauth` auth scheme or bare Django auth scheme.
+        Returns the authenticated user instance if credentials are correct,
+        else `None` will be returned
+        """
+        if 'allauth' in settings.INSTALLED_APPS:
+
+            # When `is_active` of a user is set to False, allauth tries to return template html
+            # which does not exist. This is the solution for it. See issue #264.
+            try:
+                return self.get_auth_user_using_allauth(username, email, password)
+            except url_exceptions.NoReverseMatch:
+                msg = {
+                    'error': {'message': 'Unable to log in with provided credentials.'}}
+                raise exceptions.ValidationError(msg)
+        return self.get_auth_user_using_orm(username, email, password)
+
+    @staticmethod
+    def validate_email_verification_status(user):
+        from allauth.account import app_settings
+        if (app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY and not user.emailaddress_set.filter(email=user.email, verified=True).exists()):
+            msg = {'error': {'message': 'E-mail is not verified.'}}
+
+            raise serializers.ValidationError(msg)
+
+    def validate(self, attrs):
+        username = attrs.get('username')
+        email = attrs.get('email')
+        password = attrs.get('password')
+        user = self.get_auth_user(username, email, password)
+
+        if not user:
+            msg = {
+                'error': {'message': 'Unable to log in with provided credentials.'}}
+            raise exceptions.ValidationError(msg)
+
+        # Did we get back an active user?
+        self.validate_auth_user_status(user)
+
+        # If required, is the email verified?
+        if 'dj_rest_auth.registration' in settings.INSTALLED_APPS:
+            self.validate_email_verification_status(user)
+
+        attrs['user'] = user
+        return attrs
+
+
+'''{
+    "non_field_errors": [
+        "Must include \"email\" and \"password\"."
+    ]
+}'''
 
 
 class CustomPasswordChangeSerializer(PasswordChangeSerializer):
