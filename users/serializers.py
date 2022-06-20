@@ -16,6 +16,13 @@ from django.urls import exceptions as url_exceptions
 from .forms import CustomSetPasswordForm
 from allauth.account import app_settings as allauth_settings
 from allauth.utils import email_address_exists, get_username_max_length
+from django.contrib.auth import get_user_model
+
+
+def username_exists(username):
+    users = get_user_model().objects
+    ret = users.filter(username__iexact=username).exists()
+    return ret
 
 
 class CustomRegisterSerializer(RegisterSerializer):
@@ -33,6 +40,10 @@ class CustomRegisterSerializer(RegisterSerializer):
 
     def validate_username(self, username):
         if username:
+            if username_exists(username):
+                msg = {'error_message':  'username already exist'}
+                raise serializers.ValidationError(msg)
+
             if len(username) > 50:
                 msg = {'error_message':  'username too long'}
                 raise serializers.ValidationError(msg)
@@ -56,6 +67,11 @@ class CustomRegisterSerializer(RegisterSerializer):
             if password.isdigit():
                 msg = {
                     'error_message':  'password entirely numeric'}
+                raise serializers.ValidationError(msg)
+
+            if password.isalpha():
+                msg = {
+                    'error_message':  'password entirely alphabet'}
                 raise serializers.ValidationError(msg)
             password = get_adapter().clean_password(password)
 
