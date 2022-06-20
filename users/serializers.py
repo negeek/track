@@ -17,6 +17,22 @@ from .forms import CustomSetPasswordForm
 from allauth.account import app_settings as allauth_settings
 from allauth.utils import email_address_exists, get_username_max_length
 from django.contrib.auth import get_user_model
+import re
+from django.core.exceptions import ValidationError
+from django.core.validators import EmailValidator
+
+
+def validate_email(value):
+    """Validate that a username is email like."""
+    _validate_email = EmailValidator()
+
+    try:
+        _validate_email(value)
+    except ValidationError:
+        raise exceptions.ValidationError(
+            {'error_message': 'Enter a valid email address.'})
+
+    return True
 
 
 def username_exists(username):
@@ -30,7 +46,7 @@ class CustomRegisterSerializer(RegisterSerializer):
         min_length=allauth_settings.USERNAME_MIN_LENGTH,
         required=False,  allow_blank=True, style={'input_type': 'username'})
     email = serializers.EmailField(
-        required=False,  allow_blank=True, style={'input_type': 'email'})
+        required=False,  allow_blank=True, style={'input_type': 'email'}, validators=[validate_email])
     password1 = serializers.CharField(write_only=True, required=False, allow_blank=True, style={
                                       'input_type': 'password'})
 
@@ -82,15 +98,15 @@ class CustomRegisterSerializer(RegisterSerializer):
         return password
 
     def validate_email(self, email):
-        if email:
-            email = get_adapter().clean_email(email)
-            if allauth_settings.UNIQUE_EMAIL:
-                if email and email_address_exists(email):
-                    msg = {'error_message':  'Email already exist'}
-                    raise serializers.ValidationError(msg)
-        else:
+        if not email:
             msg = {'error_message':  'input email!'}
             raise serializers.ValidationError(msg)
+
+        if allauth_settings.UNIQUE_EMAIL:
+            if email_address_exists(email):
+                msg = {'error_message':  'Email already exist'}
+                raise serializers.ValidationError(msg)
+        email = get_adapter().clean_email(email)
 
         return email
 
