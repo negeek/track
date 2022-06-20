@@ -1,4 +1,5 @@
 
+from enum import unique
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext_lazy as _
 from allauth.account.adapter import get_adapter
@@ -18,25 +19,67 @@ from allauth.utils import email_address_exists, get_username_max_length
 
 
 class CustomRegisterSerializer(RegisterSerializer):
+    username = serializers.CharField(
+        min_length=allauth_settings.USERNAME_MIN_LENGTH,
+        required=False,  allow_blank=True, style={'input_type': 'username'})
+    email = serializers.EmailField(
+        required=False,  allow_blank=True, style={'input_type': 'email'})
+    password1 = serializers.CharField(write_only=True, required=False, allow_blank=True, style={
+                                      'input_type': 'password'})
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         del self.fields['password2']
 
-    def validate(self, data):
-        if data['password1'] == ' ':
-            msg = {'error': {'message': 'input password!.'}}
+    def validate_username(self, username):
+        if username:
+            if len(username) > 50:
+                msg = {'error_message':  'username too long'}
+                raise serializers.ValidationError(msg)
+
+            username = get_adapter().clean_username(username)
+
+        else:
+            msg = {'error_message':  'input username!'}
             raise serializers.ValidationError(msg)
-        return data
+
+        return username
+
+    def validate_password1(self, password):
+
+        if password:
+            if len(password) < 8:
+                msg = {
+                    'error_message':  'password too short. Must be at least 8 characters!'}
+                raise serializers.ValidationError(msg)
+
+            if password.isdigit():
+                msg = {
+                    'error_message':  'password entirely numeric'}
+                raise serializers.ValidationError(msg)
+            password = get_adapter().clean_password(password)
+
+        else:
+            msg = {'error_message':  'input password!'}
+            raise serializers.ValidationError(msg)
+
+        return password
 
     def validate_email(self, email):
-        email = get_adapter().clean_email(email)
-        if allauth_settings.UNIQUE_EMAIL:
-            if email and email_address_exists(email):
-                msg = {
-                    'error': {'message': 'A user is already registered with this e-mail address.'}}
-                raise serializers.ValidationError(msg)
+        if email:
+            email = get_adapter().clean_email(email)
+            if allauth_settings.UNIQUE_EMAIL:
+                if email and email_address_exists(email):
+                    msg = {'error_message':  'Email already exist'}
+                    raise serializers.ValidationError(msg)
+        else:
+            msg = {'error_message':  'input email!'}
+            raise serializers.ValidationError(msg)
+
         return email
+
+    def validate(self, data):
+        return data
 
     def save(self, request):
         user = super().save(request)
@@ -49,7 +92,7 @@ class CustomRegisterSerializer(RegisterSerializer):
 
 class CustomLoginSerializer(LoginSerializer):
     password = serializers.CharField(required=False, allow_blank=True, style={
-                                     'input_type': 'password'})
+        'input_type': 'password'})
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -87,7 +130,7 @@ class CustomLoginSerializer(LoginSerializer):
                 raise exceptions.ValidationError(msg)
         return self.get_auth_user_using_orm(username, email, password)
 
-    @staticmethod
+    @ staticmethod
     def validate_email_verification_status(user):
         from allauth.account import app_settings
         if (app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY and not user.emailaddress_set.filter(email=user.email, verified=True).exists()):
