@@ -148,8 +148,6 @@ class CustomRegisterView(RegisterView):
         data = self.get_response_data(user)
 
         if data:
-            data['success'] = True
-            data['message'] = 'successfully registered'
             response = Response(
                 data,
                 status=status.HTTP_201_CREATED,
@@ -158,11 +156,9 @@ class CustomRegisterView(RegisterView):
 
             )
         else:
-            data = {}
-            data['success'] = False
-            data['message'] = 'Registration Failed'
-            response = Response(data,
-                                status=status.HTTP_204_NO_CONTENT, headers=headers,)
+
+            response = Response(
+                status=status.HTTP_204_NO_CONTENT, headers=headers,)
 
         return response
 
@@ -211,17 +207,9 @@ class CustomLoginView(LoginView):
                 context=self.get_serializer_context(),
             )
         else:
-            data = {}
-            data['success'] = False
-            data['message'] = 'error'
-            return Response(data, status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
-        data = {}
-        data['data'] = serializer.data
-        data['success'] = True
-        data['message'] = 'successfully logged in'
-
-        response = Response(data, status=status.HTTP_200_OK)
+        response = Response(serializer.data, status=status.HTTP_200_OK)
 
         return response
 
