@@ -125,7 +125,6 @@ class CustomRegisterSerializer(RegisterSerializer):
 class CustomLoginSerializer(LoginSerializer):
     password = serializers.CharField(required=False, allow_blank=True, style={
         'input_type': 'password'})
-    third_party = serializers.BooleanField(required=False, default=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -191,13 +190,6 @@ class CustomLoginSerializer(LoginSerializer):
 
         attrs['user'] = user
         return attrs
-
-
-'''{
-    "non_field_errors": [
-        "Must include \"email\" and \"password\"."
-    ]
-}'''
 
 
 class CustomPasswordChangeSerializer(PasswordChangeSerializer):
