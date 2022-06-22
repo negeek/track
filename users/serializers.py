@@ -16,7 +16,7 @@ from django.urls import exceptions as url_exceptions
 from .forms import CustomSetPasswordForm
 from allauth.account import app_settings as allauth_settings
 from allauth.utils import email_address_exists, get_username_max_length
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 import re
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator
@@ -38,6 +38,18 @@ def validate_email(value):
 def username_exists(username):
     users = get_user_model().objects
     ret = users.filter(username__iexact=username).exists()
+    return ret
+
+
+def user_exists(email):
+    users = get_user_model().objects
+    ret = users.filter(email__iexact=email, third_party=False).exists()
+    return ret
+
+
+def user_with_thirdparty_exist(email):
+    users = get_user_model().objects
+    ret = users.filter(email__iexact=email, third_party=True).exists()
     return ret
 
 
@@ -198,3 +210,78 @@ class CustomPasswordChangeSerializer(PasswordChangeSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         del self.fields['new_password2']
+
+
+class GoogleLoginSerializer(serializers.Serializer):
+    username = serializers.CharField(
+        min_length=allauth_settings.USERNAME_MIN_LENGTH,
+        required=False,  allow_blank=True, style={'input_type': 'username'}
+    )
+    email = serializers.EmailField(required=False,  allow_blank=True, style={
+                                   'input_type': 'email'}, validators=[validate_email])
+    third_party = serializers.BooleanField(required=False, default=True)
+    first_name = serializers.CharField(
+        required=False,  allow_blank=True, style={'input_type': 'username'})
+    last_name = serializers.CharField(
+        required=False,  allow_blank=True, style={'input_type': 'username'})
+
+    def authenticate(self, **kwargs):
+        return authenticate(self.context['request'], **kwargs)
+
+    def _validate_username(self, username):
+        if username:
+            if username_exists(username):
+                msg = {'error_message':  'username already exist'}
+                raise serializers.ValidationError(msg)
+
+            if len(username) > 50:
+                msg = {'error_message':  'username too long'}
+                raise serializers.ValidationError(msg)
+
+            username = get_adapter().clean_username(username)
+
+        else:
+            msg = {'error_message':  'input username!'}
+            raise serializers.ValidationError(msg)
+
+        return username
+
+    def _validate_email(self, email):
+        if not email:
+            msg = {'error_message':  'input email!'}
+            raise serializers.ValidationError(msg)
+
+        if allauth_settings.UNIQUE_EMAIL:
+            if user_exists(email):
+                msg = {'error_message':  'User with this email exists already.'}
+                raise serializers.ValidationError(msg)
+        email = get_adapter().clean_email(email)
+        return email
+
+    def get_auth_user_using_allauth(self, username, email, first_name, last_name):
+        if user_with_thirdparty_exist(email):
+            user = self.authenticate(email=email, password=email)
+            return user
+        username = self._validate_username(username)
+        email = self._validate_email(email)
+
+        user = get_user_model().objects.create_user(username=username, email=email, password=email,
+                                                    third_party=True, first_name=first_name, last_name=last_name)
+        user.save()
+        user = self.authenticate(email=email, password=email)
+        return user
+
+    def validate(self, attrs):
+        username = attrs.get('username')
+        email = attrs.get('email')
+        first_name = attrs.get('first_name')
+        last_name = attrs.get('last_name')
+        user = self.get_auth_user_using_allauth(
+            username, email, first_name, last_name)
+
+        if not user:
+            msg = _('Unable to log in with provided credentials.')
+            raise exceptions.ValidationError(msg)
+
+        attrs['user'] = user
+        return attrs
