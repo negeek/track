@@ -220,8 +220,8 @@ class GoogleLoginSerializer(serializers.Serializer):
 
         if allauth_settings.UNIQUE_EMAIL:
             if self.user_exists(email):
-                msg = {'error_message':  'User with this email already has an account that is not asscociated with a third party application. Try to login with your email and password.'}
-                raise serializers.ValidationError(msg)
+                msg = {'email': {'error_message':  'User with this email already has an account that is not asscociated with a third party application. Try to login with your email and password.'}}
+                raise exceptions.ValidationError(msg)
         email = get_adapter().clean_email(email)
         return email
 
