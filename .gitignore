@@ -6,7 +6,7 @@ works
 __pycache__
 db.sqlite3
 media
-env.py
+#env.py
 # Backup files # 
 *.bak 
 
