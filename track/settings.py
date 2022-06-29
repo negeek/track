@@ -38,12 +38,12 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 #ALLOWED_HOSTS = ['trackfi.herokuapp.com', '127.0.0.1']
 ALLOWED_HOSTS = ['*']
 # 'trackfi.herokuapp.com'
+Env = env()
+AWS_ACCESS_KEY_ID = Env.aws_access_key_id()
+AWS_SCERET_ACCESS_KEY = Env.aws_secret_access_key()
+AWS_STORAGE_BUCKET_NAME = Env.aws_storage_bucket_name()
 
-AWS_ACCESS_KEY_ID = env.aws_access_key_id()
-AWS_SCERET_ACCESS_KEY = env.aws_secret_access_key()
-AWS_STORAGE_BUCKET_NAME = env.aws_storage_bucket_name()
-
-AWS_QUERYSTRING_AUTH = env.aws_querystring_auth()
+AWS_QUERYSTRING_AUTH = Env.aws_querystring_auth()
 
 
 CORS_ORIGIN_ALLOW_ALL = True
