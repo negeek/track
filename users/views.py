@@ -1,7 +1,12 @@
+from django.contrib.auth import get_user_model
+import json
+from cash.permissions import IsAuthorOrReadOnly
+from .models import Profile
 from rest_framework.generics import GenericAPIView
+from rest_framework import generics
 from dj_rest_auth.utils import jwt_encode
 from django.contrib.auth import login as django_login
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from dj_rest_auth.registration.views import VerifyEmailView, ConfirmEmailView, RegisterView
 from dj_rest_auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView, PasswordChangeView
 from rest_framework.response import Response
@@ -9,7 +14,7 @@ from rest_framework import status
 from django.conf import settings
 from django.utils import timezone
 from rest_framework.response import Response
-from .serializers import CustomPasswordChangeSerializer, GoogleLoginSerializer
+from .serializers import CustomPasswordChangeSerializer, GoogleLoginSerializer, ProfileUpdateSerializer,  ProfileSerializer, UserProfileSerializer
 from dj_rest_auth.app_settings import JWTSerializer
 
 
@@ -184,3 +189,36 @@ class GoogleLoginView(GenericAPIView):
 
         self.login()
         return self.get_response()
+
+
+class ProfieView(generics.RetrieveAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = Profile.objects.get(user=request.user)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+
+class ProfileUpdateView(generics.UpdateAPIView):
+    serializer_class = ProfileUpdateSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def update(self, request, *args, **kwargs):
+        instance = Profile.objects.get(user=request.user)
+
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def patch(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)

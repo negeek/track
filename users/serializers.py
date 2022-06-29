@@ -1,4 +1,5 @@
 
+from drf_writable_nested.serializers import WritableNestedModelSerializer
 from enum import unique
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext_lazy as _
@@ -22,6 +23,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator
 from random import choice
 from string import digits
+from .models import Profile
 
 
 def validate_email(value):
@@ -50,9 +52,14 @@ class CustomRegisterSerializer(RegisterSerializer):
         super().__init__(*args, **kwargs)
         del self.fields['password2']
 
+    def username_exists(self, username):
+        users = get_user_model().objects
+        ret = users.filter(username__iexact=username).exists()
+        return ret
+
     def validate_username(self, username):
         if username:
-            if username_exists(username):
+            if self.username_exists(username):
                 msg = {'error_message':  'username already exist'}
                 raise serializers.ValidationError(msg)
 
@@ -263,8 +270,54 @@ class GoogleLoginSerializer(serializers.Serializer):
         user = self.get_auth_user_using_allauth(email, first_name, last_name)
 
         if not user:
-            msg = _('Unable to log in with provided credentials.')
+            msg = {
+                'error': {'message': 'Unable to log in with provided credentials.'}}
             raise exceptions.ValidationError(msg)
 
         attrs['user'] = user
         return attrs
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ('id', 'username', 'email', 'first_name', 'last_name',
+                  'third_party', 'phone_number', 'date_joined')
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ('id', 'username', 'email', 'first_name', 'last_name',
+                  'phone_number')
+        read_only_fields = ('email', 'username')
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Profile
+        fields = ('avatar', 'profile_name', 'user')
+
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer()
+
+    class Meta:
+        model = Profile
+        fields = ('avatar', 'profile_name', 'user')
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user')
+
+        user = instance.user
+        for k, v in user_data.items():
+            setattr(user, k, v)
+        user.save()
+
+        instance.avatar = validated_data.get('avatar', instance.avatar)
+        instance.profile_name = validated_data.get(
+            'profile_name', instance.profile_name)
+        instance.save()
+        return instance

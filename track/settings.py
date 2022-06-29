@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+from env import env
 from email.policy import default
 import os
 from pathlib import Path
@@ -30,9 +31,20 @@ SECRET_KEY = os.environ.get(
 #DEBUG = True
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
 #ALLOWED_HOSTS = ['trackfi.herokuapp.com', '127.0.0.1']
 ALLOWED_HOSTS = ['*']
 # 'trackfi.herokuapp.com'
+
+AWS_ACCESS_KEY_ID = env.aws_access_key_id()
+AWS_SCERET_ACCESS_KEY = env.aws_secret_access_key()
+AWS_STORAGE_BUCKET_NAME = env.aws_storage_bucket_name()
+
+AWS_QUERYSTRING_AUTH = env.aws_querystring_auth()
+
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -61,6 +73,7 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'corsheaders',
     'drf_yasg',
+    # 'drf_writable_nested',
 
 ]
 
@@ -115,6 +128,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 
@@ -196,6 +210,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -212,17 +229,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-# id="389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com"
-# secret="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"
-#LOGIN_REDIRECT_URL = 'https://trackfi.herokuapp.com/api/all-transactions'
-#ACCOUNT_LOGOUT_REDIRECT_URL = 'https://trackfi.herokuapp.com/api/users/register'
+
 
 LOGIN_REDIRECT_URL = 'http://127.0.0.1:8000/api/all-transactions'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'http://127.0.0.1:8000/api/users/register'
-
-'''https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http://127.0.0.1:8000/api/users/social/google/&prompt=consent&response_type=code&client_id=389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline'''
-
-
-'''https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=https://trackfi.herokuapp.com/api/users/social/google/&prompt=consent&response_type=code&client_id=389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline'''
-
-'''https://apitest.acme.com/oauth/authorize?response_type=code&client_id=389615847852-n6nna6ia54g6pij9l6a8vaklf467tj7j&redirect_uri=http://127.0.0.1:8000/api/users/social/google/'''
