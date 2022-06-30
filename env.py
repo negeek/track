@@ -10,10 +10,10 @@ DB_PASSWORD = 'dlion5ive'
 
 class env:
     def aws_access_key_id(self):
-        return 'AKIAXYZ5OJWC6B5BCBUP'
+        return 'AKIAXYZ5OJWC53DRZE54'
 
     def aws_secret_access_key(self):
-        return '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'
+        return 'xpzlZKDsLyvCGdnRmAVQK/oVSQfKOgM95Q+gouFP'
 
     def aws_storage_bucket_name(self):
         return 'track-profile-avatars'

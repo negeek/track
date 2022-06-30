@@ -26,7 +26,7 @@ class Profile(models.Model):
     profile_name = models.CharField(
         max_length=100, default=generate_random_username())
 
-    avatar = models.ImageField(
+    avatar = models.FileField(
         default='default.jpg', upload_to='profile_images/')
 
     def __str__(self):
