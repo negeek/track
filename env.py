@@ -13,7 +13,7 @@ class env:
         return 'AKIAXYZ5OJWC6B4MJDXB'
 
     def aws_secret_access_key(self):
-        return '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'
+        return 'emb6Y4aUr9T9oZd7XKu3SagcoGLyOzWQjSE6BV'
 
     def aws_storage_bucket_name(self):
         return 'track-profile-avatars'
