@@ -38,12 +38,20 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 #ALLOWED_HOSTS = ['trackfi.herokuapp.com', '127.0.0.1']
 ALLOWED_HOSTS = ['*']
 # 'trackfi.herokuapp.com'
+'''
 Env = env()
 AWS_ACCESS_KEY_ID = Env.aws_access_key_id()
 AWS_SCERET_ACCESS_KEY = Env.aws_secret_access_key()
 AWS_STORAGE_BUCKET_NAME = Env.aws_storage_bucket_name()
 
-AWS_QUERYSTRING_AUTH = Env.aws_querystring_auth()
+AWS_QUERYSTRING_AUTH = Env.aws_querystring_auth()'''
+
+
+AWS_ACCESS_KEY_ID = 'AKIAXYZ5OJWC6B5BCBUP'
+AWS_SCERET_ACCESS_KEY = 'nMo6SudI/nJahVKFzVvxB0xZKvIlJmRQ9cZkXLiC'
+AWS_STORAGE_BUCKET_NAME = 'track-profile-avatars'
+
+AWS_QUERYSTRING_AUTH = False
 
 
 CORS_ORIGIN_ALLOW_ALL = True
