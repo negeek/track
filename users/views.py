@@ -191,7 +191,7 @@ class GoogleLoginView(GenericAPIView):
         return self.get_response()
 
 
-class ProfieView(generics.RetrieveAPIView):
+class ProfileView(generics.RetrieveAPIView):
     serializer_class = ProfileSerializer
     permission_classes = (IsAuthenticated,)
 

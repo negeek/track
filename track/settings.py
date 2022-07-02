@@ -41,10 +41,11 @@ ALLOWED_HOSTS = ['*']
 
 Env = env()
 AWS_ACCESS_KEY_ID = Env.aws_access_key_id()
-AWS_SCERET_ACCESS_KEY = Env.aws_secret_access_key()
+AWS_SECRET_ACCESS_KEY = Env.aws_secret_access_key()
 AWS_STORAGE_BUCKET_NAME = Env.aws_storage_bucket_name()
 
 AWS_QUERYSTRING_AUTH = Env.aws_querystring_auth()
+AWS_DEFAULT_ACL = 'public-read'
 
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -74,6 +75,7 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'corsheaders',
     'drf_yasg',
+    'storages',
     # 'drf_writable_nested',
 
 ]
