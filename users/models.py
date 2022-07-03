@@ -20,11 +20,13 @@ class CustomUser(AbstractUser):
 
 
 class Profile(models.Model):
+    def username(self):
+        return self.user.username
     user = models.OneToOneField(
         get_user_model(), on_delete=models.CASCADE, related_name='profile')
 
     profile_name = models.CharField(
-        max_length=100, default=generate_random_username())
+        max_length=100, blank=True)
 
     avatar = models.FileField(
         default='default.jpg', upload_to='profile_images/')
