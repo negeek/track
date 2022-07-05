@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CategoriesView, CategoryView, TransactionView, TransactionsView
+from .views import CategoriesView, CategoryView, TransactionView, TransactionsView, DebitCreditView
 # CategoryCreateView
 urlpatterns = [
     #path('categories/create/', CategoryCreateView.as_view()),
@@ -7,6 +7,7 @@ urlpatterns = [
     path('categories/<int:id>/', CategoryView.as_view()),
     path('transactions/', TransactionsView.as_view()),
     path('transactions/<int:id>/', TransactionView.as_view()),
+    path('transactions/<str:transaction_type>/', DebitCreditView.as_view()),
 
     #path('transactions/', TransactionDetail),
     #path('all-transactions/', TransactionList),

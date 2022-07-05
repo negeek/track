@@ -52,12 +52,16 @@ class TransactionSerializer(serializers.ModelSerializer):
         return instance
 
 
-'''
-class TransactionDetailSerializer(serializers.ModelSerializer):
-    #owner = serializers.StringRelatedField(many=False)
-    category_name = CategorySerializer()
+class CategoryDBSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('category_name', 'category_type')
+        model = Category
+
+
+class TransactionDBSerializer(serializers.ModelSerializer):
+    category_id = CategoryDBSerializer()
 
     class Meta:
-        fields = ('id', 'owner', 'name', 'amount',
-                  'description', 'date_added', 'category_name')
-        model = Transaction '''
+        fields = ('id', 'name', 'amount',
+                  'description', 'time_of_transaction', 'category_id')
+        model = Transaction

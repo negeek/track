@@ -1,8 +1,9 @@
+from rest_framework import mixins, views
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from rest_framework import generics
 from .models import Transaction, Category
-from .serializers import CategorySerializer, TransactionSerializer
+from .serializers import CategorySerializer, TransactionDBSerializer, TransactionSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -96,3 +97,17 @@ class TransactionView(generics.RetrieveUpdateDestroyAPIView):
         instance.delete()
 
 # TRANSACTION FILTERING VIEWS
+
+
+class DebitCreditView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TransactionDBSerializer
+
+    def get(self, request, transaction_type):
+        transactions = Transaction.objects.filter(owner=request.user)
+        serializer = TransactionDBSerializer(transactions, many=True)
+        result = []
+        for data in serializer.data:
+            if data['category_id']['category_type'] == transaction_type:
+                result.append(data)
+        return Response(result)
