@@ -17,6 +17,7 @@ class Category(models.Model):
     category_name = models.CharField(max_length=25)
     description = models.TextField(blank=True, default='')
     color = models.CharField(max_length=25)
+
     owner = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, null=True)
     icon = models.CharField(max_length=25, default='')
@@ -31,8 +32,9 @@ class Category(models.Model):
 class Transaction(models.Model):
     name = models.CharField(max_length=25)
     category_id = models.ForeignKey(
-        Category, on_delete=models.CASCADE)
+        Category, on_delete=models.CASCADE, null=True)
     amount = models.FloatField(default=0.0)
+
     description = models.TextField(default='')
     time_of_transaction = models.DateField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
