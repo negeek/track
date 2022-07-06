@@ -7,6 +7,7 @@ from .serializers import CategorySerializer, TransactionDBSerializer, Transactio
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from datetime import date
 
 from rest_framework.permissions import IsAuthenticated
 # Create your views here.
@@ -19,7 +20,7 @@ class CategoriesView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Category.objects.filter(owner=user)
+        return Category.objects.filter(owner=user).order_by('category_name')
 
 
 class CategoryView(generics.RetrieveUpdateDestroyAPIView):
@@ -62,7 +63,7 @@ class TransactionsView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Transaction.objects.filter(owner=user)
+        return Transaction.objects.filter(owner=user).order_by('-time_of_transaction')
 
 
 class TransactionView(generics.RetrieveUpdateDestroyAPIView):
@@ -104,10 +105,34 @@ class DebitCreditView(views.APIView):
     serializer_class = TransactionDBSerializer
 
     def get(self, request, transaction_type):
-        transactions = Transaction.objects.filter(owner=request.user)
+        transactions = Transaction.objects.filter(
+            owner=request.user).order_by('-time_of_transaction')
         serializer = TransactionDBSerializer(transactions, many=True)
         result = []
         for data in serializer.data:
             if data['category_id']['category_type'] == transaction_type:
                 result.append(data)
         return Response(result)
+
+
+class DateFilterView(views.APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TransactionDBSerializer
+
+    def get(self, request, start_year, start_month, start_day, end_year=None, end_month=None, end_day=None):
+        if not end_year and not end_month and not end_day:
+            end_year, end_month, end_day = date.today(
+            ).year, date.today().month, date.today().day
+            end_date = date(end_year, end_month, end_day)
+        else:
+            end_date = date(end_year, end_month, end_day)
+
+        start_date = date(start_year, start_month, start_day)
+
+        transactions = Transaction.objects.filter(
+            owner=request.user, time_of_transaction__range=(
+                start_date, end_date)).order_by('-time_of_transaction')
+        print(transactions)
+        serializer = TransactionDBSerializer(transactions, many=True)
+        serializer = TransactionDBSerializer(transactions, many=True)
+        return Response(serializer.data)
