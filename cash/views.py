@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from rest_framework import generics
 from .models import Transaction, Category
-from .serializers import CategorySerializer, TransactionDBSerializer, TransactionSerializer
+from .serializers import CategorySerializer, TransactionFilterSerializer, TransactionSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -102,12 +102,11 @@ class TransactionView(generics.RetrieveUpdateDestroyAPIView):
 
 class DebitCreditView(views.APIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = TransactionDBSerializer
 
     def get(self, request, transaction_type):
         transactions = Transaction.objects.filter(
             owner=request.user).order_by('-time_of_transaction')
-        serializer = TransactionDBSerializer(transactions, many=True)
+        serializer = TransactionFilterSerializer(transactions, many=True)
         result = []
         for data in serializer.data:
             if data['category_id']['category_type'] == transaction_type:
@@ -117,7 +116,6 @@ class DebitCreditView(views.APIView):
 
 class DateFilterView(views.APIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = TransactionDBSerializer
 
     def get(self, request, start_year, start_month, start_day, end_year=None, end_month=None, end_day=None):
         if not end_year and not end_month and not end_day:
@@ -132,7 +130,5 @@ class DateFilterView(views.APIView):
         transactions = Transaction.objects.filter(
             owner=request.user, time_of_transaction__range=(
                 start_date, end_date)).order_by('-time_of_transaction')
-        print(transactions)
-        serializer = TransactionDBSerializer(transactions, many=True)
-        serializer = TransactionDBSerializer(transactions, many=True)
+        serializer = TransactionFilterSerializer(transactions, many=True)
         return Response(serializer.data)

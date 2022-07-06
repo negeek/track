@@ -58,7 +58,7 @@ class CategoryDBSerializer(serializers.ModelSerializer):
         model = Category
 
 
-class TransactionDBSerializer(serializers.ModelSerializer):
+class TransactionFilterSerializer(serializers.ModelSerializer):
     category_id = CategoryDBSerializer()
 
     class Meta:

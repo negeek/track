@@ -2,11 +2,9 @@ from django.urls import path
 from .views import CategoriesView, CategoryView, TransactionView, TransactionsView, DebitCreditView, DateFilterView
 from django.urls import path, register_converter, re_path
 from cash.converters import DateConverter
-register_converter(DateConverter, 'date')
 
-# CategoryCreateView
+
 urlpatterns = [
-    #path('categories/create/', CategoryCreateView.as_view()),
     path('categories/', CategoriesView.as_view()),
     path('categories/<int:id>/', CategoryView.as_view()),
     path('transactions/', TransactionsView.as_view()),
@@ -16,9 +14,5 @@ urlpatterns = [
          DateFilterView.as_view()),
     path('transactions/date/<int:start_year>/<int:start_month>/<int:start_day>/<int:end_year>/<int:end_month>/<int:end_day>/',
          DateFilterView.as_view()),
-
-
-    #path('transactions/', TransactionDetail),
-    #path('all-transactions/', TransactionList),
 
 ]
