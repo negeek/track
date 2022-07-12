@@ -180,7 +180,7 @@ class BudgetView(generics.RetrieveUpdateDestroyAPIView):
                       'days_elapsed': days_elapsed.days, 'budget_period': duration.days}
             return Response(result)
         else:
-            result = {'budget': 0, 'balance': 0, 'duration': 0}
+            result = {'budget': 0, 'balance': 0}
             return Response(result)
 
     def budget_isactive(self, id):
