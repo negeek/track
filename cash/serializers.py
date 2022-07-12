@@ -72,7 +72,7 @@ class TransactionFilterSerializer(serializers.ModelSerializer):
 class BudgetSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'amount', 'start_date', 'to_date', 'active', 'owner')
-        read_only_fields = ('start_date')
+        read_only_fields = ('start_date',)
         model = Budget
 
     def create(self, validated_data):
