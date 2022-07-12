@@ -17,6 +17,6 @@ urlpatterns = [
 
     path('budgets/', BudgetsView.as_view()),
     path('budgets/<int:id>/', BudgetView.as_view()),
-    path('budgets/status/<int:id>/', BudgetStatus.as_view()),
+    # path('budgets/status/<int:id>/', BudgetStatus.as_view()),
 
 ]

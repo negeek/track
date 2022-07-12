@@ -171,7 +171,7 @@ class BudgetStatus(views.APIView):
 
     def budget_isactive(self, id):
         today = date.today()
-        budget = Budget.objects.get(id=id)
+        budget = get_object_or_404(Budget, id=id)
         if today > budget.to_date:
             budget['active'] = False
             budget.save()
@@ -182,13 +182,6 @@ class BudgetStatus(views.APIView):
 class BudgetView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = BudgetSerializer
-
-    def retrieve(self, request, id, * args, **kwargs):
-        self.check_active_budgets()
-        instance = get_object_or_404(Budget, id=id)
-
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
 
     def update(self, request, id, * args, **kwargs):
         instance = get_object_or_404(Budget, id=id)
@@ -203,8 +196,34 @@ class BudgetView(generics.RetrieveUpdateDestroyAPIView):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def get(self, request, id, *args, **kwargs):
-        return self.retrieve(request, id, *args, **kwargs)
+    def get(self, request, id):
+        if self.budget_isactive(id):
+            transactions = Transaction.objects.filter(
+                owner=request.user, budget_id=id)
+            total_expense = 0
+            serializer = TransactionFilterSerializer(transactions, many=True)
+            for data in serializer.data:
+                if data['category_id']['category_type'] == 'debit':
+                    total_expense += data['amount']
+            budget = get_object_or_404(Budget, id=id)
+            balance = (budget.amount)-total_expense
+            duration = budget.to_date-budget.start_date
+            days_elapsed = date.today()-budget.start_date
+            result = {'budget': budget.amount, 'balance': balance,
+                      'days_elapsed': days_elapsed.days, 'budget_period': duration.days}
+            return Response(result)
+        else:
+            result = {'budget': 0, 'balance': 0, 'duration': 0}
+            return Response(result)
+
+    def budget_isactive(self, id):
+        today = date.today()
+        budget = get_object_or_404(Budget, id=id)
+        if today > budget.to_date:
+            budget['active'] = False
+            budget.save()
+            return False
+        return True
 
     def patch(self, request, id, *args, **kwargs):
         return self.update(request, id, *args, **kwargs)
