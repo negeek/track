@@ -2,8 +2,8 @@ from rest_framework import mixins, views
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from rest_framework import generics
-from .models import Transaction, Category
-from .serializers import CategorySerializer, TransactionFilterSerializer, TransactionSerializer
+from .models import Transaction, Budget
+from .serializers import CategorySerializer, TransactionFilterSerializer, TransactionSerializer, BudgetSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -132,3 +132,82 @@ class DateFilterView(views.APIView):
                 start_date, end_date)).order_by('-time_of_transaction')
         serializer = TransactionFilterSerializer(transactions, many=True)
         return Response(serializer.data)
+
+# BUDGET
+
+
+class BudgetsView(generics.ListCreateAPIView):
+    serializer_class = BudgetSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user = self.request.user
+
+        return Budget.objects.filter(owner=user, active=True)
+
+
+class BudgetStatus(views.APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, id):
+        if self.budget_isactive(id):
+            transactions = Transaction.objects.filter(
+                owner=request.user, budget_id=id)
+            total_expense = 0
+            serializer = TransactionFilterSerializer(transactions, many=True)
+            for data in serializer.data:
+                if data['category_id']['category_type'] == 'debit':
+                    total_expense += data['amount']
+            budget = get_object_or_404(Budget, id=id)
+            balance = (budget.amount)-total_expense
+            duration = budget.to_date-budget.start_date
+            days_elapsed = date.today()-budget.start_date
+            result = {'budget': budget, 'balance': balance, 'duration': str(
+                days_elapsed.days)+'/'+str(duration.days)}
+            return Response(result)
+        else:
+            result = {'budget': 0, 'balance': 0, 'duration': 0}
+            return Response(result)
+
+    def budget_isactive(self, id):
+        today = date.today()
+        budget = Budget.objects.get(id=id)
+        if today > budget.to_date:
+            budget['active'] = False
+            budget.save()
+            return False
+        return True
+
+
+class BudgetView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BudgetSerializer
+
+    def retrieve(self, request, id, * args, **kwargs):
+        self.check_active_budgets()
+        instance = get_object_or_404(Budget, id=id)
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def update(self, request, id, * args, **kwargs):
+        instance = get_object_or_404(Budget, id=id)
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def destroy(self, request, id,  *args, **kwargs):
+        instance = get_object_or_404(Budget, id=id)
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def get(self, request, id, *args, **kwargs):
+        return self.retrieve(request, id, *args, **kwargs)
+
+    def patch(self, request, id, *args, **kwargs):
+        return self.update(request, id, *args, **kwargs)
+
+    def perform_destroy(self, instance):
+        instance.delete()

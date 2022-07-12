@@ -29,14 +29,25 @@ class Category(models.Model):
         return self.category_name
 
 
+class Budget(models.Model):
+    amount = models.FloatField(default=0.0)
+    start_date = models.DateField(default=date.today())
+    to_date = models.DateField(default=date.today())
+    active = models.BooleanField(default=True)
+    owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class Transaction(models.Model):
     name = models.CharField(max_length=25)
     category_id = models.ForeignKey(
         Category, on_delete=models.CASCADE, null=True)
+    budget_id = models.ForeignKey(Budget, on_delete=models.CASCADE, null=True)
     amount = models.FloatField(default=0.0)
 
     description = models.TextField(default='')
-    time_of_transaction = models.DateField(default=timezone.now)
+    time_of_transaction = models.DateField(default=date.today)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(

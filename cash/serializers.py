@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Transaction, Category
+from .models import Transaction, Category, Budget
 from django.contrib.auth import get_user_model
 
 
@@ -31,7 +31,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'name', 'description', 'category_id',
-                  'amount', 'time_of_transaction', 'owner')
+                  'amount', 'time_of_transaction', 'budget_id', 'owner')
         model = Transaction
 
     def create(self, validated_data):
@@ -48,6 +48,8 @@ class TransactionSerializer(serializers.ModelSerializer):
         instance.time_of_transaction = validated_data.get(
             'time_of_transaction', instance.time_of_transaction)
         instance.owner = validated_data.get('owner', instance.owner)
+        instance.budget_id = validated_data.get(
+            'budget_id', instance.budget_id)
         instance.save()
         return instance
 
@@ -65,3 +67,26 @@ class TransactionFilterSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'amount',
                   'description', 'time_of_transaction', 'category_id')
         model = Transaction
+
+
+class BudgetSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('id', 'amount', 'start_date', 'to_date', 'active', 'owner')
+        read_only_fields = ('start_date')
+        model = Budget
+
+    def create(self, validated_data):
+        return Budget.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.amount = validated_data.get(
+            'amount', instance.amount)
+        instance.start_date = validated_data.get(
+            'start_date', instance.start_date)
+        instance.to_date = validated_data.get(
+            'to_date', instance.to_date)
+        instance.start_date = validated_data.get(
+            'active', instance.active)
+        instance.owner = validated_data.get('owner', instance.owner)
+        instance.save()
+        return instance
