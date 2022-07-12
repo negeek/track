@@ -162,7 +162,7 @@ class BudgetStatus(views.APIView):
             balance = (budget.amount)-total_expense
             duration = budget.to_date-budget.start_date
             days_elapsed = date.today()-budget.start_date
-            result = {'budget': budget, 'balance': balance, 'duration': str(
+            result = {'budget': budget.amount, 'balance': balance, 'duration': str(
                 days_elapsed.days)+'/'+str(duration.days)}
             return Response(result)
         else:
