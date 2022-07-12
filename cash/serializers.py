@@ -85,7 +85,7 @@ class BudgetSerializer(serializers.ModelSerializer):
             'start_date', instance.start_date)
         instance.to_date = validated_data.get(
             'to_date', instance.to_date)
-        instance.start_date = validated_data.get(
+        instance.active = validated_data.get(
             'active', instance.active)
         instance.owner = validated_data.get('owner', instance.owner)
         instance.save()

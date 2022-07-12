@@ -220,7 +220,7 @@ class BudgetView(generics.RetrieveUpdateDestroyAPIView):
         today = date.today()
         budget = get_object_or_404(Budget, id=id)
         if today > budget.to_date:
-            budget['active'] = False
+            budget.active = False
             budget.save()
             return False
         return True
