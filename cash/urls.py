@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CategoriesView, CategoryView, TransactionView, TransactionsView, DebitCreditView, DateFilterView, BudgetsView, BudgetView, BudgetStatus
+from .views import CategoriesView, CategoryView, TransactionView, TransactionsView, DebitCreditView, DateFilterView, BudgetsView, BudgetView
 from django.urls import path, register_converter, re_path
 from cash.converters import DateConverter
 
