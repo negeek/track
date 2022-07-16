@@ -2,7 +2,7 @@ from rest_framework import mixins, views
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from rest_framework import generics
-from .models import Transaction, Budget
+from .models import Transaction, Budget, Category
 from .serializers import CategorySerializer, TransactionFilterSerializer, TransactionSerializer, BudgetSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
